@@ -1,4 +1,4 @@
-- name: install nginx
+- name: install nginx server
   ansible.builtin.dnf:
     name: nginx
     state: latest
