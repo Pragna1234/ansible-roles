@@ -40,7 +40,8 @@
     src: expense.config.j2
     dest: /etc/nginx/default.d/expense.conf
     mode: 0644  # Ensure correct permissions
-  notify: Restart nginx  
+  notify: 
+  - Restart nginx  
 #Handlers are the notifiers in ansible,usually when there is chnage in config file , we can notify some task to restart server.
 # - name: Restart nginx
 #   ansible.builtin.service:
