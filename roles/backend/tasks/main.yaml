@@ -1,69 +1,69 @@
 - name: disable default nodejs
-    ansible.builtin.command: dnf module disable nodejs -y
+  ansible.builtin.command: dnf module disable nodejs -y
 
-  - name: enable nodejs:20
-    ansible.builtin.command: dnf module enable nodejs:20 -y  #works for all distributions hetrogenious
+- name: enable nodejs:20
+  ansible.builtin.command: dnf module enable nodejs:20 -y  #works for all distributions hetrogenious
 
-  - name: Install nodejs and mysql
-    ansible.builtin.dnf: #only works for redhat family homogenious
-      name: "{{ item }}"
-      state: installed
-    loop:
-      - nodejs
-      - mysql
+- name: Install nodejs and mysql
+  ansible.builtin.dnf: #only works for redhat family homogenious
+    name: "{{ item }}"
+    state: installed
+  loop:
+    - nodejs
+    - mysql
 
-  - name: create Expense-application user
-    ansible.builtin.user:
-      name: expense
+- name: create Expense-application user
+  ansible.builtin.user:
+    name: expense
 
-  - name: Create App Directory
-    ansible.builtin.file:
-      path: /app
-      state: directory #it creates directory otherwise it simply creates file
+- name: Create App Directory
+  ansible.builtin.file:
+    path: /app
+    state: directory #it creates directory otherwise it simply creates file
 
-  - name: Download backend application code
-    ansible.builtin.get_url:
-      url: https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip
-      dest: /tmp/backend.zip
+- name: Download backend application code
+  ansible.builtin.get_url:
+    url: https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip
+    dest: /tmp/backend.zip
 
-  - name: Unzip backend application code
-    ansible.builtin.unarchive:
-      src: /tmp/backend.zip #by default checks in ansible server(telling ansible not to check in ansible server check in remote server)
-      dest: /app
-      remote_src: yes
+- name: Unzip backend application code
+  ansible.builtin.unarchive:
+    src: /tmp/backend.zip #by default checks in ansible server(telling ansible not to check in ansible server check in remote server)
+    dest: /app
+    remote_src: yes
 
-  - name: Install npm dependencies
-    ansible.builtin.command: npm install
-    args: 
-      chdir: /app
+- name: Install npm dependencies
+  ansible.builtin.command: npm install
+  args: 
+    chdir: /app
 
-  - name: Copy backend service
-    ansible.builtin.template:
-      src: backend.service.j2
-      dest: /etc/systemd/system/backend.service
+- name: Copy backend service
+  ansible.builtin.template:
+    src: backend.service.j2
+    dest: /etc/systemd/system/backend.service
 
-  - name: install python mysql dependencies
-    ansible.builtin.pip:
-      name:
-        - PyMySQL
-        - cryptography
-      executable: pip3.9 # pip3.11 if python version is 3.11
+- name: install python mysql dependencies
+  ansible.builtin.pip:
+    name:
+      - PyMySQL
+      - cryptography
+    executable: pip3.9 # pip3.11 if python version is 3.11
 
-  - name: import data into mysql
-    community.mysql.mysql_db:
-      login_user: "{{ login_user }}""
-      login_password: "{{ login_password  }}"
-      login_host: "{{ login_host }}"
-      target: /app/schema/backend.sql
-      state: import
-      name: all
+- name: import data into mysql
+  community.mysql.mysql_db:
+    login_user: "{{ login_user }}"
+    login_password: "{{ login_password }}"
+    login_host: "{{ login_host }}"
+    target: /app/schema/backend.sql
+    state: import
+    name: all
 
-  - name: daemon-reload
-    ansible.builtin.systemd:
-      daemon_reload: true
+- name: daemon-reload
+  ansible.builtin.systemd:
+    daemon_reload: true
 
-  - name: start and enable backend services
-    ansible.builtin.service:
-      name: backend
-      state: started
-      enabled: yes
+- name: start and enable backend services
+  ansible.builtin.service:
+    name: backend
+    state: started
+    enabled: yes
