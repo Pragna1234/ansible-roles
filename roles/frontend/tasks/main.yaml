@@ -1,0 +1,48 @@
+- name: install nginx
+  ansible.builtin.dnf:
+    name: nginx
+    state: latest
+
+- name: start and enable nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Delete default website
+  ansible.builtin.file:
+    path: /usr/share/nginx/html/
+    state: absent
+
+- name: Create html directory
+  ansible.builtin.file:
+    path: /usr/share/nginx/html/
+    state: directory
+
+- name: Download frontend code
+  ansible.builtin.get_url:
+    url: https://expense-builds.s3.us-east-1.amazonaws.com/expense-frontend-v2.zip
+    dest: /tmp/frontend.zip
+
+- name: Unzip frontend application code
+  ansible.builtin.unarchive:
+    src: /tmp/frontend.zip
+    dest: /usr/share/nginx/html
+    remote_src: yes
+
+- name: Copy frontend conf
+  ansible.builtin.file:
+    path: /etc/nginx/default.d/
+    state: directory
+
+- name: Copy backend conf
+  ansible.builtin.template:
+    src: expense.conf.j2
+    dest: /etc/nginx/default.d/expense.conf
+    mode: 0644  # Ensure correct permissions
+  notify: Restart nginx  
+#Handlers are the notifiers in ansible,usually when there is chnage in config file , we can notify some task to restart server.
+# - name: Restart nginx
+#   ansible.builtin.service:
+#     name: nginx
+#     state: restarted
