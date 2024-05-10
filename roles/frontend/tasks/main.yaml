@@ -13,12 +13,12 @@
   ansible.builtin.import_role:
     name: common
     tasks_from: app-pre-req
-    
+
 - name: Copy frontend conf
   ansible.builtin.file:
     path: /etc/nginx/default.d/
     state: directory
-
+#if there is chnage in configuration only, thenyou need to restart nginx
 - name: Copy backend conf
   ansible.builtin.template:
     src: expense.config.j2
