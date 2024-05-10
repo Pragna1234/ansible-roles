@@ -1,1 +1,3 @@
 BACKEND_API_URL: backend.pragnadevops.online
+APP_LOCATION: /usr/share/nginx/html
+component: frontend

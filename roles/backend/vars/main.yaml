@@ -2,3 +2,5 @@ login_user: root
 login_password: ExpenseApp@1
 login_host: db.pragnadevops.online
 DB_HOST: db.pragnadevops.online
+APP_LOCATION: /app
+component: backend
